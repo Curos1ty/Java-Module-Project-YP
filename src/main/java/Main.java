@@ -5,42 +5,41 @@ public class Main {
     Программа запрашивает у пользователя данные для калькулятора счета, вызывает методы и выводит итоговую информацию.
      */
     public static void main(String[] args) {
-        byte amount = getValidAmount();
+        int amount = getValidAmount();
 
         double total= addProducts();
-        String textRub = getTextRub(total, amount);
+
+        String textRub = getTextRub(total/amount);
 
         System.out.format("Сумма которую должен заплатить каждый человек - %.2f %s",(total / amount), textRub);
 
     }
     /*
-    Возвращает строку, описываюющую правильное окончание в слове "рубль" в зависимости от целочисленной части.
+    Возвращает строку, описывающую правильное окончание в слове "рубль" в зависимости от целочисленной части.
      */
-    public static String getTextRub(double total, int amount) {
-        String textRub;
-        int rubles = (int) total / amount;
-        if ( rubles % 10 == 1) {
-            textRub = "рубль";
+    public static String getTextRub(double rubles) {
+        if (rubles % 100 >= 11 && rubles % 100 <= 19) {
+            return "рублей";
+        } else if ( rubles % 10 == 1) {
+            return "рубль";
         } else if ( rubles % 10 >= 2 && rubles % 10 <=4) {
-            textRub = "рубля";
+            return "рубля";
         } else {
-            textRub = "рублей";
+            return "рублей";
         }
-        return textRub;
     }
     /*
     Запрашивает количество людей для разделения счета и потом возвращает значение.
      */
-    public static byte getValidAmount() {
-        byte amount;
-
+    public static int getValidAmount() {
+        int amount;
+        Scanner s = new Scanner(System.in);
         while (true) {
-            Scanner s = new Scanner(System.in);
             System.out.println("Пожалуйста, введите количество людей для разделения счета:");
 
             if (s.hasNextInt()) {
-                amount = (byte) s.nextInt();
-                if (amount > 1 && amount < 127) {
+                amount = s.nextInt();
+                if (amount > 1) {
                     break;
                 } else {
                     System.out.println(
@@ -92,10 +91,15 @@ public class Main {
                     s.next();
                 }
             }
-            Calculate product = new Calculate(productName, price);
-            products.append(productName).append("\n");
+            Product product = new Product(productName, price);
+            products.append(product.getProductName()).append("\n");
             total += product.getPrice();
-            System.out.println("Товар успешно добавлен.\nХотите добавить ещё один товар?");
+            System.out.println(
+                    """
+                            Товар успешно добавлен.
+                            Хотите добавить ещё один товар? Чтобы продолжить, введите любой символ.
+                            Введите 'завершить', если хотите получить результат подсчета."""
+            );
             select = s.next();
         }
 
@@ -105,13 +109,13 @@ public class Main {
     /*
     Предоставляет информацию о товаре.
      */
-    public static class Calculate {
-        double price;
-        String productName;
+    public static class Product {
+        private final double price;
+        private final String productName;
         /*
         Конструктор класса.
          */
-        public Calculate(String productName, double price) {
+        public Product(String productName, double price) {
             this.productName = productName;
             this.price = price;
         }
@@ -121,6 +125,10 @@ public class Main {
          */
         public double getPrice() {
             return price;
+        }
+
+        public String getProductName() {
+            return productName;
         }
     }
 }
